@@ -4,92 +4,135 @@ var request = require("request");
 var Twitter = require("twitter");
 var Spotify = require('node-spotify-api');
 var keys = require("./keys.js");
+var inquirer = require("inquirer");
 console.log("Type:\n tweets---to get latest Tweets,\n spotify-this-song ---to get song info based on track,\n movie-this---to get song info  based on name ,\n or do-what-it-says to get started!");
 var choice = process.argv[2];
-
 var firstinput = process.argv[3];
-
-//process multiple words. Triggers if user types anything more than the above console logged options and first parameter.
-for (i = 4; i < process.argv.length; i++) {
-  firstinput += '+' + process.argv[i];
-}
 var spotify = new Spotify({
   id: '2886cb80f5e141b7b166da5ddf8dd6ab',
   secret: '14605d5660e14606b10c73eb9fcc57af',
 });
-theGreatSwitch();
-function theGreatSwitch() {
-  //action statement, switch statement to declare what action to execute.
-  console.log(choice);
-  switch (choice) {
-    case 'tweets':
-      Tweets();
-      break;
-
-    case 'spotify-this-song':
-      song();
-      break;
-
-    case 'movie-this':
-      Movie();
-      break;
-
-    // case 'do-what-it-says':
-    // followTheTextbook();
-    // break;
-
-  }
+inquirer.prompt([
+  {
+  type: "list",
+  message: "Whats would you like to do?",
+  choices: ["my-tweets", "spotify-this-song", "movie-this", "do-what-it-says"],
+  name: "selections"
 }
-function Tweets() {
+
+]).then(function(select)
+{
+  // console.log(JSON.stringify(confData, null, 2));
+  
+  if (select.selections == "my-tweets") {
+    console.log('')
+    console.log(' You selected: my-tweets');
+    inquirer.prompt([
+      {
+          type: "input",
+          message: "What Tweets Do u want to Search?",
+          name: "Tweet"
+      }
+
+  ]).then(function (inquirerResponse) {
+    console.log(inquirerResponse.Tweet)
+  appendtext();
   var client = new Twitter({
     consumer_key: keys.twitterKeys.consumer_key,
     consumer_secret: keys.twitterKeys.consumer_secret,
     access_token_key: keys.twitterKeys.access_token_key,
     access_token_secret: keys.twitterKeys.access_token_secret
   });
-  var params = { screen_name: firstinput };
+  var selection=inquirerResponse.Tweet
+  var params = { screen_name: selection };
   console.log(params);
   client.get('statuses/user_timeline', params, function (error, tweets, response) {
     if (!error) {
       // console.log(tweets);
       for (i = 0; i < tweets.length; i++) {
-        // var Data = ('Number: ' + (i+1) + '\n' + tweets[i].created_at + '\n' + tweets[i].text + '\n');
-        console.log("****************  Tweeter  *********************");
-        console.log('Number: ' + (i + 1));
-        console.log('Created_at: ' + tweets[i].created_at);
-        console.log('tweet: ' + tweets[i].text);
-        console.log('Retweets: ' + tweets[i].retweet_count);
-        console.log('Fav.Count: ' + tweets[i].favorite_count);
-        console.log("------------------------------------------------");
+        appendtext("****************  Tweeter  *********************");
+        appendtext('Number: ' + (i + 1));
+        appendtext('Created_at: ' + tweets[i].created_at);
+        appendtext('tweet: ' + tweets[i].text);
+        appendtext('Retweets: ' + tweets[i].retweet_count);
+        appendtext('Fav.Count: ' + tweets[i].favorite_count);
+        appendtext("------------------------------------------------");
       }
     }
-  });
-}
-function song() {
+  })
+});
+  }
+else if  (select.selections == "spotify-this-song"){
+  var listofsongs=[];
+  inquirer.prompt([
+    {
+        type: "input",
+        message: "What Song Do u want to Search?",
+        name: "track"
+    }
+
+]).then(function (inquirerResponse) {
+  console.log(inquirerResponse.track)
+  var firstinput=inquirerResponse.track;
   var songtrack;
-  console.log(songtrack);
+  // console.log(songtrack);
   if (firstinput === undefined) {
     songtrack = "The Sign";
-    console.log(songtrack);
+    // console.log(songtrack);
   }
   else {
     songtrack = firstinput;
-    console.log(songtrack);
+    // console.log(songtrack);
   }
+  fs.appendFile('random.txt', "\n"+"spotify-this-song:"+songtrack, (err) => {  
+    if (err) throw err;
+    console.log(' updated!');
+  })
+  
   spotify.search({ type: 'track', query: songtrack }, function (err, data) {
-    console.log(songtrack);
+    var songs=data.tracks.items;
+    for(var item in songs){
+       listofsongs.push(songs[item].name);
+    }
+    inquirer.prompt([
+      {
+          type: "list",
+          message: "Songs Related to your search?",
+          choices: listofsongs,
+          name: songs,
+      }
+  
+  ]).then(function (inquirerResponse) {
+    console.log(inquirerResponse.track)
     if (err) {
       return console.log('Error occurred: ' + err);
     }
-    console.log("****************  Spotify-Song  *********************");
-    console.log("Song Name:" + data.tracks.items[0].name);
-    console.log("Preview Link:" + data.tracks.items[0].preview_url);
-    console.log("Artists:" + data.tracks.items[0].artists[0].name);
-    console.log("*****************  The End  ********************");
+    appendtext("****************  Spotify-Song  *********************");
+    appendtext("Song Name:" + data.tracks.items[0].name);
+    appendtext("Preview Link:" + data.tracks.items[0].preview_url);
+    appendtext("Artists:" + data.tracks.items[0].artists[0].name);
+    appendtext("*****************  The End  ********************");
   });
+})
+})
 }
+// })
+// })
+// }
+
+
 // movie details
-function Movie() {
+else if  (select.selections == "movie-this") {
+  inquirer.prompt([
+    {
+        type: "input",
+        message: "What Movie Do u want to Search?",
+        name: "name"
+    }
+
+]).then(function (inquirerResponse) {
+  console.log(inquirerResponse.name)
+  var firstinput=inquirerResponse.name;
   console.log(firstinput);
   var movieName;
   console.log(movieName);
@@ -108,19 +151,45 @@ function Movie() {
   request(queryUrl, function (error, response, body) {
     // If the request is successful
     if (!error && response.statusCode === 200) {
-      console.log("****************  Movie-Details  *********************");
-      console.log("Movie Title: " + JSON.parse(body).Title);
-      console.log("Release Year: " + JSON.parse(body).Year);
-      console.log("IMDB Ratings: " + JSON.parse(body).imdbRating);
-      console.log("Rotten Tomatoes Ratings: " + JSON.parse(body).tomatoRating);
-      console.log("Country Produces: " + JSON.parse(body).Country);
-      console.log("Language: " + JSON.parse(body).Language);
-      console.log("Plot: " + JSON.parse(body).Plot);
-      console.log("Actors: " + JSON.parse(body).Actors);
-      console.log("*****************  The End  ********************");
+      appendtext("****************  Movie-Details  *********************");
+      appendtext("Movie Title: " + JSON.parse(body).Title);
+      appendtext("Release Year: " + JSON.parse(body).Year);
+      appendtext("IMDB Ratings: " + JSON.parse(body).imdbRating);
+      appendtext("Rotten Tomatoes Ratings: " + JSON.parse(body).tomatoRating);
+      appendtext("Country Produces: " + JSON.parse(body).Country);
+      appendtext("Language: " + JSON.parse(body).Language);
+      appendtext("Plot: " + JSON.parse(body).Plot);
+      appendtext("Actors: " + JSON.parse(body).Actors);
+      appendtext("*****************  The End  ********************");
     }
     else {
       console.log('Error occurred.')
     }
-  });
+  })
+})
 }
+else if (select.selections == "do-what-it-says") {
+  console.log('')
+  fs.readFile('song.txt', "utf8", function(error, data){
+    var txt = data.split(',');
+    console.log(txt);
+    spotify.search({ type: 'track', query:txt[1]}, function (err, data) {
+    
+      if (err) {
+        return console.log('Error occurred: ' + err);
+      }
+      appendtext("****************  Spotify-Song  *********************");
+      appendtext("Song Name:" + data.tracks.items[0].name);
+      appendtext("Preview Link:" + data.tracks.items[0].preview_url);
+      appendtext("Artists:" + data.tracks.items[0].artists[0].name);
+      appendtext("*****************  The End  ********************");
+    });
+  })
+}; 
+function appendtext(inputstring){
+  fs.appendFile('log.txt', "\n"+inputstring, (err) => {  
+    if (err) throw err;
+  })
+  console.log(inputstring);
+}
+})
