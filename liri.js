@@ -106,14 +106,21 @@ else if  (select.selections == "spotify-this-song"){
     // console.log(this.selectedIndex);
     console.log(listofsongs.indexOf(inquirerResponse.songs));
    var index=listofsongs.indexOf(inquirerResponse.songs)
+   var name=data.tracks.items[index].name;
+    var link=data.tracks.items[index].preview_url;
+    var artists=data.tracks.items[index].artists[0].name;
     // console.log(inquirerResponse.songs)
     if (err) {
       return console.log('Error occurred: ' + err);
     }
     appendtext("****************  Spotify-Song  *********************");
-    appendtext("Song Name:" + data.tracks.items[index].name);
-    appendtext("Preview Link:" + data.tracks.items[index].preview_url);
-    appendtext("Artists:" + data.tracks.items[index].artists[0].name);
+    appendtext("Song Name:" + name);
+    if(link===null){
+      appendtext("Preview Link:" +"preview link is not available");
+    }else{
+    appendtext("Preview Link:" +link);
+    }
+    appendtext("Artists:" + artists);
     appendtext("*****************  The End  ********************");
   });
 })
