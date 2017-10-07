@@ -94,31 +94,31 @@ else if  (select.selections == "spotify-this-song"){
     for(var item in songs){
        listofsongs.push(songs[item].name);
     }
+
     inquirer.prompt([
       {
           type: "list",
           message: "Songs Related to your search?",
           choices: listofsongs,
-          name: songs,
+          name: "songs",
       }
-  
   ]).then(function (inquirerResponse) {
-    console.log(inquirerResponse.track)
+    // console.log(this.selectedIndex);
+    console.log(listofsongs.indexOf(inquirerResponse.songs));
+   var index=listofsongs.indexOf(inquirerResponse.songs)
+    // console.log(inquirerResponse.songs)
     if (err) {
       return console.log('Error occurred: ' + err);
     }
     appendtext("****************  Spotify-Song  *********************");
-    appendtext("Song Name:" + data.tracks.items[0].name);
-    appendtext("Preview Link:" + data.tracks.items[0].preview_url);
-    appendtext("Artists:" + data.tracks.items[0].artists[0].name);
+    appendtext("Song Name:" + data.tracks.items[index].name);
+    appendtext("Preview Link:" + data.tracks.items[index].preview_url);
+    appendtext("Artists:" + data.tracks.items[index].artists[0].name);
     appendtext("*****************  The End  ********************");
   });
 })
 })
 }
-// })
-// })
-// }
 
 
 // movie details

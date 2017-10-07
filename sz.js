@@ -326,8 +326,8 @@ var track={
   previous: null,
   total: 25498 }
   for (var item in track["items"]) {
-      console.log(track["items"][item].artists[0].name);
-}
+     var a=(track["items"][item]["name"]);
+   console.log(a);
  
   
   
