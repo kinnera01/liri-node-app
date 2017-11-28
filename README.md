@@ -1,4 +1,4 @@
-Introduction
+# Introduction
 
 I created a node.js app called LIRI. LIRI is like SIRI (from an iphone).It must be ran in the command line.
 LIRI is a Language Interpretation and Recognition Interface.LIRI will be a command line node app that takes in parameters and gives you back data.LIRI will do any of the below command when you enter them into the command line.
@@ -46,14 +46,10 @@ node liri.js movie-this '<movie name here>'this would output the following infor
 
 node liri.js do-what-it-saysThese are the npm packages I used and are needed to run the app
 
-NPM Packages Used:
+# NPM Packages Used:
 
-•	twitter
-
-•	Spotify
-
-•	request
-
-•	OMDB
-
-•	Inquirer
+* twitter
+* Spotify
+*	request
+* OMDB
+* Inquirer
